@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Movies</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="images/logo1.png" type="image/png" sizes="16x16">
+  <link rel="stylesheet" href="css.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  
+  
+</head>
+<body>
+<div ></div>
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+  <p style="text-align:center;width:100%;height:100%;color:white;margin:0;font-size:30px;">Movies</p>
+  </ul>
+</nav>
+
+<div class="d-flex flex-column" id="topRated" style="height:auto;margin:5px;padding:10px">
+  <p style="text-align:left;color:white;margin:0;font-size:25px;color:dodgerblue;margin-bottom:5px;">Top Rated Movies</p>
+  <div class="d-flex flex-row justify-content-center flex-wrap" style="height:100%;width:100%;">
+    <!-- <div style="width:100px;height:100px;background-color: firebrick;margin:5px;"></div> -->
+    <div class="card"  v-for="x in todos" v-bind:onclick="x.search">
+      <img class="card-img-top" v-bind:src="x.image" alt="Card image">
+      <div class="card-body pb-2">
+        <h4 class="card-title p-0 m-0" style="font-size:20px">{{x.title}}</h4>
+        <!-- <p class="card-text">{{x.overview}}</p> -->
+        <span class="" style="margin:0 0 5 0;color:chocolate;">Rating : {{x.rating}}</span>
+      </div>
+      <!-- <span class="button" style="position:relative;bottom:0px;margin-right:auto;margin-left:auto;margin-bottom:5px;">Know More </span> -->
+      <button class="button"><span>Know More</span></button>
+  </div>
+</div>
+</div>
+
+<div class="d-flex flex-column" id="upcoming" style="height:auto;margin:5px;padding:10px">
+  <p style="text-align:left;color:white;margin:0;font-size:25px;color:dodgerblue;margin-bottom:5px;">Upcoming Movies</p>
+  <div class="d-flex flex-row justify-content-center flex-wrap" style="height:100%;width:100%;">
+    <!-- <div style="width:100px;height:100px;background-color: firebrick;margin:5px;"></div> -->
+    <div class="card" v-for="x in todos" v-bind:onclick="x.search">
+      <img class="card-img-top" v-bind:src="x.image" alt="Card image">
+      <div class="card-body pb-2">
+        <h4 class="card-title m-0" style="font-size:20px">{{x.title}}</h4>
+        <!-- <p class="card-text">{{x.overview}}</p> -->
+        <span class="" style="margin:0 0 5 0;color:chocolate;">Rating : {{x.rating}}</span>
+      </div>
+      <button class="button"><span>Know More</span></button>
+  </div>
+</div>
+</div>
+<!-- <div class="container-fluid" id="upcoming">
+  <p style="text-align:left;color:white;margin:0;font-size:20px;color:dodgerblue">Top Rated Movies</p>
+</div> -->
+<script>
+  new Vue({
+  el: '#topRated',
+  filters: {
+    currencydecimal (value) {
+      return value.toFixed(2)
+    }
+  },
+  data: {
+    todos: []
+  },
+  mounted () {
+    axios
+      .get('https://api.themoviedb.org/3/movie/top_rated?api_key=a6446bb450b9574201e727e4a437c07a&language=en-US&page=1')
+      .then(response => {
+        len=(response.data.results).length
+        arr=[]
+        for(var i=0;i<len;i++){
+          obj={image:null,title:null,rating:null}
+          var str=(response.data.results[i].title).replace(/ /g, "_");
+          obj.search="window.open("+"'https://it.wikipedia.org/wiki/"+str+"')";
+          obj.image="https://image.tmdb.org/t/p/w500"+response.data.results[i].poster_path;
+          obj.title=response.data.results[i].title;
+          // obj.overview=response.data.results[i].overview;
+          obj.rating=response.data.results[i].vote_average;
+          arr[i]=obj;
+        }
+        this.todos=arr;
+        console.log(response)
+      })
+      .catch(error => {
+        alert("Server Error!")
+      })
+  }
+})
+
+new Vue({
+  el: '#upcoming',
+  filters: {
+    currencydecimal (value) {
+      return value.toFixed(2)
+    }
+  },
+  data: {
+    search:null,
+    todos: []
+  },
+  mounted () {
+    axios
+      .get('https://api.themoviedb.org/3/movie/upcoming?api_key=a6446bb450b9574201e727e4a437c07a&language=en-US&page=1')
+      .then(response => {
+        len=(response.data.results).length
+        arr=[]
+        for(var i=0;i<len;i++){
+          obj={image:null,title:null,rating:null}
+          obj.search="window.open("+"'https://www.google.com/search?q="+encodeURIComponent(response.data.results[i].title)+"')";
+          obj.image="https://image.tmdb.org/t/p/w500"+response.data.results[i].poster_path;
+          obj.title=response.data.results[i].title;
+          // obj.overview=response.data.results[i].overview;
+          obj.rating=response.data.results[i].vote_average;
+          arr[i]=obj;
+        }
+        this.todos=arr;
+        console.log(response)
+      })
+      .catch(error => {
+        alert("Server Error!")
+      })
+  }
+})
+</script>
+</body>
+</html>
+
